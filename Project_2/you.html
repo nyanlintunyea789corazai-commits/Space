@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Letter For You 💌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Pinyon+Script&family=Lato:wght@300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-dark: #0d0810;
+            --accent-purple: #c89aff;
+            --text-main: #f0e8ff;
+            --glass-bg: rgba(15, 8, 28, 0.6);
+            --border-glow: rgba(200, 160, 255, 0.2);
+        }
+
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+        }
+
+        /* --- Background --- */
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6);
+            transform: scale(1.05); /* Slight zoom for depth */
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(10, 4, 18, 0.3), rgba(10, 4, 18, 0.7));
+            z-index: 1;
+        }
+
+        /* --- Entry Screen --- */
+        #entry {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease;
+        }
+
+        #entry.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .entry-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 90%;
+            animation: fadeIn 1.2s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .entry-title {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .name-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--accent-purple);
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 10px;
+            outline: none;
+            margin-bottom: 2rem;
+        }
+
+        .open-btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            padding: 12px 30px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .open-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--accent-purple);
+        }
+
+        /* --- Letter Screen --- */
+        #letter-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            pointer-events: none;
+        }
+
+        #letter-screen.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .letter-paper {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-glow);
+            padding: 50px;
+            max-width: 700px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            scrollbar-width: thin;
+        }
+
+        .letter-body {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background: var(--accent-purple);
+            animation: blink 0.8s infinite;
+            margin-left: 2px;
+            vertical-align: middle;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Floating petals */
+        .petal {
+            position: fixed;
+            top: -10%;
+            z-index: 2;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg">
+    <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=2000" alt="Background">
+</div>
+<div class="overlay"></div>
+
+<div id="entry">
+    <div class="entry-card">
+        <div class="entry-title">Hello</div>
+        <p style="margin-bottom: 20px; font-style: italic; opacity: 0.7;">Please enter your name</p>
+        <input type="text" id="userName" class="name-input" placeholder="Your name..." autocomplete="off">
+        <button class="open-btn" onclick="openLetter()">Open Letter</button>
+    </div>
+</div>
+
+<div id="letter-screen">
+    <div class="letter-paper">
+        <div class="letter-body" id="letterContent"></div>
+        <div class="cursor"></div>
+    </div>
+</div>
+
+<script href="you.js">
+    const content = [
+        "I wanted to take a moment to write this specifically for you.",
+        "There's something about the way you see the world that is truly rare. I've noticed how you handle things with such grace, even when things get difficult.",
+        "I’m not great with words, but I hope this small gesture lets you know how much you are appreciated. You deserve to know that someone sees the effort you put in every single day.",
+        "Thank you for being exactly who you are. 🌸"
+    ];
+
+    async function openLetter() {
+        const nameInput = document.getElementById('userName').value.trim();
+        const name = nameInput || "Friend";
+        
+        document.getElementById('entry').classList.add('hide');
+        document.getElementById('letter-screen').classList.add('show');
+
+        const display = document.getElementById('letterContent');
+        const greeting = `Dearest ${name},<br><br>`;
+        display.innerHTML = greeting;
+
+        for (let phrase of content) {
+            const p = document.createElement('p');
+            p.style.marginBottom = "20px";
+            display.appendChild(p);
+            await typeEffect(p, phrase);
+            await new Promise(r => setTimeout(r, 800));
+        }
+    }
+
+    function typeEffect(element, text) {
+        return new Promise(resolve => {
+            let i = 0;
+            const interval = setInterval(() => {
+                element.innerHTML += text.charAt(i);
+                i++;
+                if (i >= text.length) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 50);
+        });
+    }
+
+    // Create floating petals
+    function createPetals() {
+        for (let i = 0; i < 15; i++) {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.innerHTML = '🌸';
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.fontSize = (Math.random() * 10 + 10) + 'px';
+            petal.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            petal.style.opacity = Math.random();
+            document.body.appendChild(petal);
+        }
+    }
+    createPetals();
+
+    
+</script>
+
+</body>
+</html>
